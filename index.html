@@ -305,8 +305,44 @@ const PREPS = [
   {ga:'idir', en:'between',      f:['idir mé','idir tú','idir é','idir í','eadrainn','eadraibh','eatarthu'], ex:['Roinn sé eadrainn é.','He shared it between us.']},
 ];
 const P = ga => PREPS.find(p => p.ga === ga);
+
+/* how each one is used — shown on the level's start page */
+const USES = {
+  ar:   {gist:'Physically <b>on</b> something — and feelings, illnesses and moods are “on” you in Irish.',
+         ex:[['Tá hata air.','He has a hat on (him).'],['Tá ocras / tart / eagla orm.','I’m hungry / thirsty / afraid.'],['Tá slaghdán uirthi.','She has a cold.'],['Cad atá ort?','What’s wrong with you?']]},
+  ag:   {gist:'Irish has no verb “to have” — things are “<b>at</b>” you instead. Also used for things you know.',
+         ex:[['Tá madra agam.','I have a dog. (A dog is at me.)'],['Tá Gaeilge aige.','He speaks Irish. (Irish is at him.)'],['An bhfuil peann agat?','Have you got a pen?']]},
+  do:   {gist:'Giving or telling something <b>to</b> someone, or doing it <b>for</b> them. Also how you say your name.',
+         ex:[['Tabhair dom é.','Give it to me.'],['Inis dom!','Tell me!'],['Cad is ainm duit?','What’s your name? (What is the name to you?)']]},
+  le:   {gist:'Together <b>with</b> someone — and for likes, loves and “can”.',
+         ex:[['Tar liom!','Come with me!'],['Is maith liom / Is breá liom…','I like / I love…'],['Is féidir liom…','I can…'],['Tá sí ag fanacht linn.','She is waiting for us.']]},
+  'ó':  {gist:'Something coming <b>from</b> someone — and wanting or needing (it’s wanted “from” you).',
+         ex:[['Fuair mé litir uaidh.','I got a letter from him.'],['Cad atá uait?','What do you want?'],['Teastaíonn cabhair uaim.','I need help.']]},
+  de:   {gist:'Taking something <b>off</b>, and asking someone something.',
+         ex:[['Bain díot do chóta.','Take off your coat.'],['Thit sé de.','It fell off him.'],['D’fhiafraigh mé di.','I asked her.']]},
+  as:   {gist:'<b>Out of</b> something — and being proud of or trusting someone.',
+         ex:[['Bhain sé geit asam.','He gave me a fright. (Got a jump out of me.)'],['Tá mé bródúil aisti.','I’m proud of her.'],['Tá muinín agam as.','I trust him.']]},
+  faoi: {gist:'<b>Under</b> something, or talking / laughing <b>about</b> someone.',
+         ex:[['Bhí siad ag caint fúinn.','They were talking about us.'],['Ná bí ag gáire fúm!','Don’t be laughing at me!'],['Fág fúm é.','Leave it to me.']]},
+  chuig:{gist:'Sending, writing or moving <b>towards</b> a person. (Giving something = <b>do</b>; sending it = <b>chuig</b>.)',
+         ex:[['Scríobh sí chugam.','She wrote to me.'],['Seol chugam é.','Send it to me.'],['Tar chugam!','Come to me!']]},
+  roimh:{gist:'<b>Before</b> or ahead of someone — and for welcome and fear of someone.',
+         ex:[['Tá fáilte romhat.','You’re welcome.'],['Tá eagla orm roimhe.','I’m afraid of him.'],['Bhí sé ann romhainn.','He was there before us.']]},
+  i:    {gist:'<b>In</b> something. <b>ann</b> also means “there” / “exists”.',
+         ex:[['Níl aon mhaith ann.','It’s no use. (No good in it.)'],['An bhfuil sé ann?','Is he there?'],['Tá misneach inti.','She has courage (in her).']]},
+  thar: {gist:'Going <b>over</b> or <b>past</b> someone or something.',
+         ex:[['Chuaigh an bus tharam.','The bus went past me.'],['Léim sé thairis.','He jumped over it.']]},
+  idir: {gist:'<b>Between</b> people — sharing, or keeping a secret.',
+         ex:[['Roinn sé eadrainn é.','He shared it between us.'],['Eadrainn féin…','Between ourselves… (it’s a secret)']]},
+};
+function usesBox(g){
+  const u = USES[g], p = P(g);
+  return `<div class="tip"><div style="font-size:19px;margin-bottom:4px"><b>${p.ga}</b> = ${p.en}</div>${u.gist}
+    <ul style="margin:8px 0 0 18px">${u.ex.map(([ga, en]) => `<li><b>${ga}</b> — ${en}</li>`).join('')}</ul></div>`;
+}
+
 // English meanings overlap (to him = dó or chuige; from me = uaim or díom) — never offer one as a wrong answer for the other
-const CONFUSE = {do:['chuig'], chuig:['do'], 'ó':['de'], de:['ó']};
+const CONFUSE = {do:['chuig'], chuig:['do'], 'ó':['de','as'], de:['ó'], as:['ó']};
 const FORMCOUNT = {}; PREPS.forEach(p => p.f.forEach(f => FORMCOUNT[f] = (FORMCOUNT[f]||0) + 1));
 
 const SENTS = [
@@ -391,16 +427,16 @@ const PFORM = {
   presMe:{t:'pres', who:'mé',          en:v=>`I ${v.base}`,         end:'-(a)ím'},
   pastWe:{t:'past', who:'sinn / muid', en:v=>`we ${v.pastEn}`,      end:'-(a)íomar'},
   presWe:{t:'pres', who:'sinn / muid', en:v=>`we ${v.base}`,        end:'-(a)ímid'},
-  futWe: {t:'fut',  who:'sinn / muid', en:v=>`we will ${v.base}`,   end:'-(e)óimid'},
+  futWe: {t:'fut',  who:'sinn / muid', en:v=>`we will ${v.base}`,   end:'-óimid / -eoimid'},
 };
 const NEG = {
   negCmd: {t:'cmd', from:'cmd', word:'Ná',     en:v=>`Don’t ${v.base}!`,  rule:'<b>Ná</b> + the command. Before a vowel add <b>h</b>: Ná <b>h</b>éirigh!'},
   negPast:{t:'past',from:'past',word:'Níor',   en:v=>`didn’t ${v.base}`,  rule:'<b>Níor</b> + séimhiú (add <b>h</b>). The <b>D’</b> disappears: Níor éirigh, Níor fhoghlaim.'},
   qPast:  {t:'past',from:'past',word:'Ar…?',   en:v=>`did … ${v.base}?`,  rule:'<b>Ar</b> + séimhiú (add <b>h</b>), and no <b>D’</b>: Ar cheannaigh? Ar éirigh?'},
   negPres:{t:'pres',from:'pres',word:'Ní',     en:v=>`doesn’t ${v.base}`, rule:'<b>Ní</b> + séimhiú (add <b>h</b>). Vowels don’t change: Ní éiríonn.'},
-  qPres:  {t:'pres',from:'pres',word:'An…?',   en:v=>`does … ${v.base}?`, rule:'<b>An</b> + urú: c→<b>g</b>c, t→<b>d</b>t, d→<b>n</b>d, f→<b>bh</b>f. Vowels don’t change: An éiríonn?'},
+  qPres:  {t:'pres',from:'pres',word:'An…?',   en:v=>`does … ${v.base}?`, rule:'<b>An</b> + urú (a letter in front): c→<b>g</b>c, t→<b>d</b>t, d→<b>n</b>d, f→<b>bh</b>f. Vowels don’t change: An éiríonn?'},
   negFut: {t:'fut', from:'fut', word:'Ní',     en:v=>`won’t ${v.base}`,   rule:'<b>Ní</b> + séimhiú (add <b>h</b>). Vowels don’t change.'},
-  qFut:   {t:'fut', from:'fut', word:'An…?',   en:v=>`will … ${v.base}?`, rule:'<b>An</b> + urú: An <b>g</b>ceannóidh? Vowels don’t change: An éireoidh?'},
+  qFut:   {t:'fut', from:'fut', word:'An…?',   en:v=>`will … ${v.base}?`, rule:'<b>An</b> + urú (a letter in front): An <b>g</b>ceannóidh? Vowels don’t change: An éireoidh?'},
 };
 
 const QW = [
@@ -417,7 +453,7 @@ const QW = [
   ['Cé hé / hí sin?','Who’s that?','Cé hí sin? = Who’s that (girl)?'],
   ['Cá bhfios duit?','How do you know?','Cá bhfios duit go bhfuil sé tinn? = How do you know he’s sick?'],
   ['An dóigh leat?','Do you think?','An dóigh leat go mbeidh sé fliuch? = Do you think it’ll be wet?'],
-  ['Fíor nó bréagach?','True or false?','Tá an spéir glas. Fíor nó bréagach? = The sky is green. True or false?'],
+  ['Fíor nó bréagach?','True or false?','Tá an féar gorm. Fíor nó bréagach? = The grass is blue. True or false?'],
 ];
 const BI = [
   {ga:'Inné',   c:'r', q:'An raibh…?',  y:'Bhí',   n:'Ní raibh',  wh:'Cá raibh…?',  whEn:'Where was / were…?',  ex:'An raibh tú ar scoil inné?',            exEn:'Were you at school yesterday?'},
@@ -444,6 +480,12 @@ function mkOpts(ans, near, far=[], n=4){
   return shuffle(out);
 }
 const mc = o => ({t:'mc', ...o, options: mkOpts(o.ans, o.near || [], o.far || [])});
+// while a level builds its questions, SCOPE limits wrong options to what has been taught so far
+let SCOPE = null;
+const inPreps = () => SCOPE && SCOPE.preps ? PREPS.filter(q => SCOPE.preps.includes(q.ga)) : PREPS;
+const inVerbs = () => SCOPE && SCOPE.verbs ? VERBS.filter(v => SCOPE.verbs.includes(v.id)) : VERBS;
+const inForms = () => SCOPE && SCOPE.forms ? SCOPE.forms : null;
+const inQW = () => SCOPE && SCOPE.qw ? SCOPE.qw : null;
 const IN_EN = 'Cad é sin i mBéarla? · In English?';
 const IN_GA = 'Cuir Gaeilge air · In Irish?';
 
@@ -458,24 +500,26 @@ function poQ(i, dir = rnd(3)){
   if(dir === 0){ const e = ga === 'a' ? 'his / her / their' : en;
     return mc({key, tag:IN_EN, prompt:ga, sub:'(my, your, his…)', ans:e, near:POSS.filter(p=>p[0]!==ga).map(p=>p[1]), note:ga === 'a' ? `<b>a</b> = his, her or their · <b>a chóta</b> (his coat), <b>a cóta</b> (her coat), <b>a gcóta</b> (their coat)` : note}); }
   if(dir === 1) return mc({key, tag:IN_GA, prompt:en, ans:ga, near:POSS.map(p=>p[0]), note});
-  return mc({key, tag:'Which “my, your…” word goes with…', prompt:PERS[i], ans:ga, near:POSS.map(p=>p[0]), note:`${PERS[i]} → <b>${ga}</b> (${en})`});
+  return mc({key, tag:'Cén focal? · Which “my, your…” word goes with this person?', prompt:PERS[i], ans:ga, near:POSS.map(p=>p[0]), note:`${PERS[i]} → <b>${ga}</b> (${en})`});
 }
 
 /* prepositional pronouns */
 const ppLabel = (p, i) => `${p.ga} + ${PERS[i]}`;
 const HAVE = ['I have','you have','he has','she has','we have','you have','they have'];
-const ppEn = (p, i) => p.ga === 'idir' ? `between ${OBJ[i]}${i < 4 ? ' and …' : ''}` : p.ga === 'ag' ? `at ${OBJ[i]} (${HAVE[i]})` : `${p.en} ${OBJ[i]}`;
+const ppEn = (p, i) => p.ga === 'idir' ? `between ${OBJ[i]}${i < 4 ? ' and …' : ''}` : p.ga === 'ag' ? `at ${OBJ[i]} — ${HAVE[i]}` : `${p.en} ${OBJ[i]}`;
 const ppNote = (p, i) => `<b>${p.ga}</b> + <b>${PERS[i]}</b> = <b>${p.f[i]}</b> · “${ppEn(p, i)}”`;
-function ppNear(p, i){ return [...p.f.filter((_, j) => j !== i), ...PREPS.filter(q => q !== p).map(q => q.f[i])]; }
+function ppNear(p, i){ return [...p.f.filter((_, j) => j !== i), ...inPreps().filter(q => q !== p).map(q => q.f[i])]; }
 function ppQ(p, i, dir = rnd(3)){
   const key = `pp:${p.ga}:${i}`, note = ppNote(p, i);
   if(dir === 1 && FORMCOUNT[p.f[i]] === 1){
-    const near = [...p.f.map((_, j) => ppLabel(p, j)), ...PREPS.map(q => ppLabel(q, i))].filter(x => x !== ppLabel(p, i));
+    const near = [...p.f.map((_, j) => ppLabel(p, j)), ...inPreps().map(q => ppLabel(q, i))].filter(x => x !== ppLabel(p, i));
     return mc({key, tag:'Bris ina dhá chuid é · Split it in two', prompt:p.f[i], ans:ppLabel(p, i), near, note});
   }
   if(dir === 2){ const clash = CONFUSE[p.ga] || [];
-    return mc({key, tag:IN_GA, prompt:ppEn(p, i), ans:p.f[i], near:shuffle(p.f).slice(0,3).concat(PREPS.filter(q => !clash.includes(q.ga)).map(q=>q.f[i])), note}); }
-  return mc({key, tag:'Cuir le chéile · Put them together', prompt:ppLabel(p, i), sub:ppEn(p, i), ans:p.f[i], near:take(ppNear(p, i).slice(0,6), 2).concat(take(ppNear(p,i).slice(6), 3)), note});
+    const near = shuffle(p.f).slice(0,3).concat(inPreps().filter(q => !clash.includes(q.ga)).map(q=>q.f[i]))
+      .filter(f => f === p.f[i] || FORMCOUNT[f] === 1); // "di" is two different words — never a wrong option here
+    return mc({key, tag:IN_GA, prompt:ppEn(p, i), ans:p.f[i], near, far:p.f.filter(f => FORMCOUNT[f] === 1), note}); }
+  return mc({key, tag:'Cuir le chéile · Put them together', prompt:ppLabel(p, i), sub:ppEn(p, i), ans:p.f[i], near:take(ppNear(p, i).slice(0,6), 2).concat(take(ppNear(p,i).slice(6), 3)), far:p.f, note});
 }
 function ppNext(p, i = 2 + rnd(5)){
   const shown = p.f.slice(0, i).join(' · ');
@@ -499,14 +543,15 @@ function sentQ(s){
 /* verbs */
 function vbMean(v, dir = rnd(2)){
   const key = `vb:${v.id}:cmd`, note = `<b>${v.cmd}</b> = ${v.label}`;
-  if(dir === 0) return mc({key, tag:IN_EN, prompt:v.cmd, ans:v.label, near:VERBS.map(x => x.label), note});
-  return mc({key, tag:IN_GA, prompt:v.label, ans:v.cmd, near:VERBS.map(x => x.cmd), note});
+  if(dir === 0) return mc({key, tag:IN_EN, prompt:v.cmd, ans:v.label, near:inVerbs().map(x => x.label), note});
+  return mc({key, tag:IN_GA, prompt:v.label, ans:v.cmd, near:inVerbs().map(x => x.cmd), note});
 }
 const FORMS = ['cmd','past','pres','fut','vn','va'];
 function pastFakes(v){ const c = lc(v.cmd); return [v.cmd, "D'" + c, "D'" + len(c), len(v.cmd), VOW.test(c) ? 'H' + c : 'D' + c]; }
 function vbForm(v, t){
-  const others = FORMS.filter(f => f !== t).map(f => v[f]).filter(x => x.toLowerCase() !== v[t].toLowerCase());
-  const near = (t === 'past' && Math.random() < .5) ? pastFakes(v) : others;
+  const allowed = inForms() || FORMS;
+  const others = FORMS.filter(f => f !== t && allowed.includes(f)).map(f => v[f]).filter(x => x.toLowerCase() !== v[t].toLowerCase());
+  const near = (t === 'past' && (others.length < 2 || Math.random() < .5)) ? pastFakes(v) : others;
   return mc({key:`vb:${v.id}:${t}`, tag:`${pill(t)} &nbsp;${TN[t].en}`, prompt:v.cmd, sub:v.label, ans:v[t], near, far:VERBS.map(x => x[t]),
     note:`${v.cmd} → <b>${v[t]}</b> (${enOf(v, t)})${v.id === 'I' && t === 'vn' ? ' — yes, it’s the same word as the command!' : ''}`});
 }
@@ -521,7 +566,7 @@ function vbSeq(v){
 }
 function vbPerson(v, f){
   const d = PFORM[f];
-  return mc({key:`vb:${v.id}:${f}`, tag:`${pill(d.t)} &nbsp;+ <b>${d.who}</b>`, prompt:v.cmd, sub:v.label,
+  return mc({key:`vb:${v.id}:${f}`, tag:`${pill(d.t)} &nbsp;+ <b>${d.who}</b> · Cuir Gaeilge air`, prompt:v.cmd, sub:v.label,
     ans:v[f], near:Object.keys(PFORM).filter(k => k !== f).map(k => v[k]),
     note:`<b>${v[f]}</b> = ${d.en(v)} · ending <b>${d.end}</b>${d.who === 'mé' ? '' : ` <span style="color:var(--mute)">(you’ll also hear <b>${v[d.t]} muid</b>)</span>`}`});
 }
@@ -565,8 +610,9 @@ function cap3(t){ return {past:'Past', pres:'Pres', fut:'Fut'}[t]; }
 function qwQ(i, dir = rnd(2)){
   const [ga, en, ex] = QW[i], key = 'qw:' + i, note = `<b>${ga}</b> = ${en}<br><span style="color:var(--mute)">${ex}</span>`;
   const ok = j => !((i === 0 && j === 10) || (i === 10 && j === 0)); // Cé? vs Cé hé sin? too close
-  if(dir === 0) return mc({key, tag:IN_EN, prompt:ga, ans:en, near:QW.filter((_, j) => ok(j)).map(q => q[1]), note});
-  return mc({key, tag:IN_GA, prompt:en, ans:ga, near:QW.filter((_, j) => ok(j)).map(q => q[0]), note});
+  const pool = j => ok(j) && (!inQW() || inQW().includes(j));
+  if(dir === 0) return mc({key, tag:IN_EN, prompt:ga, ans:en, near:QW.filter((_, j) => pool(j)).map(q => q[1]), note});
+  return mc({key, tag:IN_GA, prompt:en, ans:ga, near:QW.filter((_, j) => pool(j)).map(q => q[0]), note});
 }
 const biPill = b => `<span class="tp ${b.c}">${b.ga}</span>`;
 function biAns(i, yes = Math.random() < .5){
@@ -627,7 +673,7 @@ function rowsTable(head, rows){
 }
 function verbTable(vs, cols){
   const cls = {cmd:'', past:'r', pres:'y', fut:'b', vn:'', va:'', presMe:'y', pastWe:'r', presWe:'y', futWe:'b'};
-  const head = {cmd:'Ordú', past:'Inné', pres:'Gach lá', fut:'Amárach', vn:'Ainm br.', va:'Aidiacht br.', label:'English', presMe:'Gach lá + mé', pastWe:'Inné + muid', presWe:'Gach lá + muid', futWe:'Amárach + muid'};
+  const head = {cmd:'Ordú', past:'Inné', pres:'Gach lá', fut:'Amárach', vn:'Ainm briathartha (…-ing)', va:'Aidiacht bhriathartha (…-ed)', label:'English', presMe:'Gach lá + mé', pastWe:'Inné + muid', presWe:'Gach lá + muid', futWe:'Amárach + muid'};
   return tw(`<table class="tb"><tr>${cols.map(c => `<th class="${cls[c] || ''}">${head[c]}</th>`).join('')}</tr>
     ${vs.map(v => `<tr>${cols.map(c => `<td class="${c === 'label' ? 'p' : 'f'} ${cls[c] || ''}">${v[c]}</td>`).join('')}</tr>`).join('')}</table>`);
 }
@@ -641,17 +687,18 @@ const prepLevel = (gas, prev = []) => () => {
   const nMc = gas.length === 1 ? 8 : 9;
   facts.slice(0, nMc).forEach(([p, i], k) => out.push(ppQ(p, i, k < 3 ? 0 : rnd(3))));
   ps.forEach(p => out.push(ppNext(p)));
-  take(prev, 2).forEach(g => { const p = P(g); out.push(ppQ(p, rnd(7))); });
+  take(prev, 2).forEach(g => { const p = P(g), q = ppQ(p, rnd(7)); q.tag = `🔁 Siar (<b>${p.ga}</b>) · ${q.tag}`; out.push(q); });
   out.push(ppMatch(take(facts, 5)));
   const easy = out.slice(0, 3), rest = shuffle(out.slice(3));
   return [...easy, ...rest, ...ps.map(ppBuild)];
 };
-const prepIntro = gas => () => prepTable(gas) + gas.map(g => { const p = P(g); return `<div class="tip">💬 <b>${p.ex[0]}</b><br>${p.ex[1]}</div>`; }).join('');
+const prepIntro = gas => () => gas.map(usesBox).join('') + prepTable(gas);
 
 const vRange = (a, b) => VERBS.slice(a, b);
 const GAMES = [
   { id:'me-tu-se', title:'Mé, Tú, Sé', emoji:'🙋', bg:'linear-gradient(135deg,#169B62,#2CB67D)',
     blurb:'Start here! I, you, he, she… and my, your, his, her.',
+    about:'These are the building blocks for the rest of the card — the prepositions (<b>agam</b> = ag + mé) and the verbs (<b>Cheannaigh mé</b> = I bought) are all built with them. <b>sinn</b> and <b>muid</b> both mean “we”. The “my, your…” words can change the next word: <b>mo chóta</b> (my coat), <b>ár gcóta</b> (our coat).',
     levels:[
       {nm:'Mé, tú, sé', e:'🙋', sb:'I, you, he, she…',
        learn:() => rowsTable(['Gaeilge','English'], PRON.map(p => [p[0], p[1]])),
@@ -664,7 +711,7 @@ const GAMES = [
        tip:'<b>a</b> can mean his, her or their! The word after it tells you which: <b>a chóta</b> (his coat, adds h) · <b>a cóta</b> (her coat, no change) · <b>a gcóta</b> (their coat, adds a letter).',
        build:() => [...range(7).map(i => poQ(i, i < 2 ? 1 : rnd(3))), poQ(rnd(7), 2),
          matchQ([0,1,4,5].map(i => [POSS[i][0], POSS[i][1], 'po:' + i]).concat([['a', 'his / her / their', 'po:2']])),
-         {t:'build', keys:range(7).map(i => 'po:' + i), tag:'Meaitseáil · Which word goes with each person?', prompt:'mo, do, a…', slots:PERS, tiles:POSS.map(p => p[0]), note:POSS.map(p => p[0]).join(' · ')}]},
+         {t:'build', keys:range(7).map(i => 'po:' + i), tag:'Tóg é · Which word goes with each person?', prompt:'mo, do, a…', slots:PERS.map((p, i) => `${p} (${POSS[i][1]})`), tiles:POSS.map(p => p[0]), note:POSS.map(p => p[0]).join(' · ')}]},
       {nm:'Measctha!', e:'⭐', sb:'Speed mix', boss:true, timed:true,
        learn:() => rowsTable(['','','',''], PRON.map((p, i) => [p[0], p[1], POSS[i][0], POSS[i][1]])),
        tip:'⏱️ Speed round — you have 12 seconds for each one!',
@@ -672,73 +719,76 @@ const GAMES = [
     ]},
   { id:'reamhfhocail', title:'Réamhfhocail', emoji:'🧲', bg:'linear-gradient(135deg,#FF883E,#E8457A)',
     blurb:'agam, orm, liom… The little words that stick to mé, tú, sé. One column at a time.',
+    about:'Little words like <b>ag</b> (at), <b>ar</b> (on) and <b>le</b> (with) join onto mé, tú, sé… to make one word: ag + mé = <b>agam</b>. Irish uses them where English uses a verb: <b>Tá madra agam</b> = I have a dog (a dog is at me), <b>Tá ocras orm</b> = I’m hungry (hunger is on me), <b>Is maith liom</b> = I like. Each level explains how one or two are used, then drills the column until you can chant it.',
     levels:[
-      {nm:'ag', e:'🫴', sb:'agam, agat…', learn:prepIntro(['ag']), tip:'Say the column out loud like a song: <b>agam, agat, aige, aici, againn, agaibh, acu</b>.', build:prepLevel(['ag'])},
-      {nm:'ar', e:'🧢', sb:'orm, ort…', learn:prepIntro(['ar']), tip:'Chant it: <b>orm, ort, air, uirthi, orainn, oraibh, orthu</b>.', build:prepLevel(['ar'], ['ag'])},
-      {nm:'do & le', e:'🎁', sb:'dom, liom…', learn:prepIntro(['do','le']), tip:'<b>dó</b> = to him, <b>di</b> = to her. <b>leis</b> = with him, <b>léi</b> = with her.', build:prepLevel(['do','le'], ['ag','ar'])},
-      {nm:'ó, de, as', e:'📤', sb:'uaim, díom, asam', learn:prepIntro(['ó','de','as']), tip:'Watch out: with <b>sé</b>, “de” and “as” don’t change at all — <b>de</b>, <b>as</b>.', build:prepLevel(['ó','de','as'], ['ag','ar','do','le'])},
-      {nm:'faoi & chuig', e:'📬', sb:'fúm, chugam', learn:prepIntro(['faoi','chuig']), tip:'<b>faoi</b> + sé stays <b>faoi</b>. Most forms start with <b>fú-</b> and <b>chug-</b>.', build:prepLevel(['faoi','chuig'], ['ag','ar','do','le','ó','de','as'])},
-      {nm:'roimh & i', e:'🚪', sb:'romham, ionam', learn:prepIntro(['roimh','i']), tip:'<b>i</b> + sé = <b>ann</b> — the odd one out! <b>i</b> + sí = <b>inti</b>.', build:prepLevel(['roimh','i'], ['ag','ar','do','le','faoi','chuig'])},
-      {nm:'thar & idir', e:'🌉', sb:'tharam, eadrainn', learn:prepIntro(['thar','idir']), tip:'<b>idir</b> only changes with the plurals: <b>eadrainn, eadraibh, eatarthu</b>.', build:prepLevel(['thar','idir'], PREPS.map(p => p.ga).filter(g => g !== 'thar' && g !== 'idir'))},
+      {nm:'ag', scope:{preps:['ag']}, e:'🫴', sb:'agam, agat…', learn:prepIntro(['ag']), tip:'Say the column out loud like a song: <b>agam, agat, aige, aici, againn, agaibh, acu</b>.', build:prepLevel(['ag'])},
+      {nm:'ar', scope:{preps:['ag','ar']}, e:'🧢', sb:'orm, ort…', learn:prepIntro(['ar']), tip:'Chant it: <b>orm, ort, air, uirthi, orainn, oraibh, orthu</b>.', build:prepLevel(['ar'], ['ag'])},
+      {nm:'do & le', scope:{preps:['ag','ar','do','le']}, e:'🎁', sb:'dom, liom…', learn:prepIntro(['do','le']), tip:'<b>dó</b> = to him, <b>di</b> = to her. <b>leis</b> = with him, <b>léi</b> = with her.', build:prepLevel(['do','le'], ['ag','ar'])},
+      {nm:'ó, de, as', scope:{preps:['ag','ar','do','le','ó','de','as']}, e:'📤', sb:'uaim, díom, asam', learn:prepIntro(['ó','de','as']), tip:'Watch out: with <b>sé</b>, “de” and “as” don’t change at all — <b>de</b>, <b>as</b>. And <b>di</b> is two words: de + sí (off her) and do + sí (to her) — the sentence tells you which.', build:prepLevel(['ó','de','as'], ['ag','ar','do','le'])},
+      {nm:'faoi & chuig', scope:{preps:['ag','ar','do','le','ó','de','as','faoi','chuig']}, e:'📬', sb:'fúm, chugam', learn:prepIntro(['faoi','chuig']), tip:'<b>faoi</b> + sé stays <b>faoi</b>; the rest start with <b>fú-</b>. <b>chuig</b> = to / towards a person: chug- for mé, tú, sinn, sibh, but <b>chuige, chuici, chucu</b>.', build:prepLevel(['faoi','chuig'], ['ag','ar','do','le','ó','de','as'])},
+      {nm:'roimh & i', scope:{preps:['ag','ar','do','le','ó','de','as','faoi','chuig','roimh','i']}, e:'🚪', sb:'romham, ionam', learn:prepIntro(['roimh','i']), tip:'<b>i</b> + sé = <b>ann</b> — the odd one out! <b>i</b> + sí = <b>inti</b>.', build:prepLevel(['roimh','i'], ['ag','ar','do','le','faoi','chuig'])},
+      {nm:'thar & idir', e:'🌉', sb:'tharam, eadrainn', learn:prepIntro(['thar','idir']), tip:'<b>idir</b> + mé, tú, é, í stays as two words (sé → é, sí → í). Only the plurals join up: <b>eadrainn, eadraibh, eatarthu</b>.', build:prepLevel(['thar','idir'], PREPS.map(p => p.ga).filter(g => g !== 'thar' && g !== 'idir'))},
       {nm:'In úsáid', e:'💬', sb:'Real sentences',
        learn:() => rowsTable(['Gaeilge','English'], take(SENTS, 6).map(s => [s[0].replace('___', '<b>' + P(s[2]).f[s[3]] + '</b>'), s[1]])),
        tip:'Now use them! Fill each gap with the right word.', build:() => take(SENTS, 12).map(sentQ)},
-      {nm:'Mór-mheascán', e:'🏆', sb:'All 13 · speed', boss:true, timed:true,
+      {nm:'Mórmheascán', e:'🏆', sb:'All 13 · speed', boss:true, timed:true,
        learn:() => prepTable(['ar','ag','do','le','ó','de','as']) + prepTable(['faoi','chuig','roimh','i','thar','idir']),
        tip:'⏱️ Speed round — every preposition, 12 seconds each!',
        build:() => range(14).map(() => ppQ(pick(PREPS), rnd(7)))},
     ]},
   { id:'briathra', title:'Briathra', emoji:'🏃', bg:'linear-gradient(135deg,#2C7BE5,#8A5CE0)',
     blurb:'13 verbs in every tense: Inné, Gach lá, Amárach — and how to say not and ask.',
+    about:'Every verb starts from the command (<b>Ordú</b>): <b>Ceannaigh!</b> = Buy! The other forms are built from it, in the same colours as the card: 🔴 <b>Inné</b> (past) adds <b>h</b> or <b>D’</b> · 🟡 <b>Gach lá</b> (present) ends <b>-(a)íonn</b> · 🔵 <b>Amárach</b> (future) ends <b>-óidh / -eoidh</b>. Later levels add the mé / muid endings, then “not” and questions (Níor, Ní, An, Ná).',
     levels:[
-      {nm:'Briathra A–G', e:'🛒', sb:'buy, start, finish…', learn:() => verbTable(vRange(0, 7), ['cmd','label']),
+      {nm:'Briathra 1', e:'🛒', scope:{verbs:'ABCDEFG'.split('')}, sb:'buy, start, finish…', learn:() => verbTable(vRange(0, 7), ['cmd','label']),
        tip:'These are commands — <b>Ceannaigh!</b> = Buy! — and every other form is built from them.',
        build:() => [...shuffle(vRange(0, 7)).map((v, k) => vbMean(v, k < 3 ? 0 : rnd(2))), vbMean(VERBS[rnd(7)], 1), matchQ(take(vRange(0, 7), 5).map(v => [v.cmd, v.label, `vb:${v.id}:cmd`]))]},
-      {nm:'Briathra H–M', e:'📖', sb:'learn, open, tell…', learn:() => verbTable(vRange(7, 13), ['cmd','label']),
-       tip:'Notice <b>Imigh</b> (go away) and <b>Imir</b> (play) — they look alike!',
-       build:() => [...shuffle(vRange(7, 13)).map((v, k) => vbMean(v, k < 3 ? 0 : rnd(2))), ...take(vRange(0, 7), 2).map(v => vbMean(v)), matchQ(take(VERBS, 5).map(v => [v.cmd, v.label, `vb:${v.id}:cmd`]))]},
-      {nm:'Inné', e:'🔴', sb:'yesterday', learn:() => verbTable(VERBS, ['cmd','past']),
-       tip:'<b>Inné</b> (past): add <b>h</b> after the first letter → <b>Ch</b>eannaigh. Starts with a vowel or <b>f</b>? Put <b>D’</b> in front → <b>D’</b>éirigh, <b>D’fh</b>oghlaim.',
+      {nm:'Briathra 2', e:'📖', sb:'leave, learn, open…', learn:() => verbTable(vRange(7, 13), ['cmd','label']),
+       tip:'Notice <b>Imigh</b> (go away) and <b>Imir</b> (play) — they look alike! (Plus a few from Level 1 to review.)',
+       build:() => [...shuffle(vRange(7, 13)).map((v, k) => vbMean(v, k < 3 ? 0 : rnd(2))), ...take(vRange(0, 7), 2).map(v => vbMean(v)).map(q => ({...q, tag:`🔁 Siar · from Level 1 · ${q.tag}`})), matchQ(take(vRange(7, 13), 5).map(v => [v.cmd, v.label, `vb:${v.id}:cmd`]))]},
+      {nm:'Inné', e:'🔴', sb:'yesterday', scope:{forms:['cmd','past']}, learn:() => verbTable(VERBS, ['cmd','past']),
+       tip:'<b>Inné</b> (past): add <b>h</b> after the first letter → <b>Ch</b>eannaigh. Starts with a vowel? Put <b>D’</b> in front → <b>D’</b>éirigh. Starts with <b>f</b>? Add <b>h</b> AND put <b>D’</b> in front → <b>D’fh</b>oghlaim.',
        build:() => take(VERBS, 11).map(v => vbForm(v, 'past'))},
-      {nm:'Gach lá', e:'🟡', sb:'every day', learn:() => verbTable(VERBS, ['cmd','pres']),
-       tip:'<b>Gach lá</b> (present): <b>-igh</b> becomes <b>-íonn</b> / <b>-aíonn</b>. Ceannaigh → Ceann<b>aíonn</b>, Dúisigh → Dúis<b>íonn</b>.',
+      {nm:'Gach lá', e:'🟡', sb:'every day', scope:{forms:['cmd','past','pres']}, learn:() => verbTable(VERBS, ['cmd','pres']),
+       tip:'<b>Gach lá</b> (present): <b>-aigh</b> → <b>-aíonn</b> (Ceannaíonn), <b>-igh</b> → <b>-íonn</b> (Dúisíonn). Oscail, Ceangail, Imir, Inis lose a letter: <b>Osclaíonn, Ceanglaíonn, Imríonn, Insíonn</b>. Foghlaim → <b>Foghlaimíonn</b>.',
        build:() => take(VERBS, 11).map(v => vbForm(v, 'pres'))},
-      {nm:'Amárach', e:'🔵', sb:'tomorrow', learn:() => verbTable(VERBS, ['cmd','fut']),
-       tip:'<b>Amárach</b> (future): <b>-óidh</b> (Ceann<b>óidh</b>) or <b>-eoidh</b> (Dúis<b>eoidh</b>).',
+      {nm:'Amárach', e:'🔵', sb:'tomorrow', scope:{forms:['cmd','past','pres','fut']}, learn:() => verbTable(VERBS, ['cmd','fut']),
+       tip:'<b>Amárach</b> (future): <b>-aigh</b> → <b>-óidh</b> (Ceannóidh), <b>-igh</b> → <b>-eoidh</b> (Dúiseoidh). Watch: <b>Osclóidh, Ceanglóidh, Imreoidh, Inseoidh, Foghlaimeoidh</b>.',
        build:() => take(VERBS, 11).map(v => vbForm(v, 'fut'))},
-      {nm:'Trí aimsir', e:'🚦', sb:'red, yellow, blue', learn:() => verbTable(VERBS, ['cmd','past','pres','fut']),
-       tip:'🔴 Inné · 🟡 Gach lá · 🔵 Amárach. Spot the clues: <b>h</b> or <b>D’</b> = Inné, <b>-íonn</b> = Gach lá, <b>-óidh</b> = Amárach.',
+      {nm:'Trí aimsir', e:'🚦', sb:'red, yellow, blue', scope:{forms:['cmd','past','pres','fut']}, learn:() => verbTable(VERBS, ['cmd','past','pres','fut']),
+       tip:'🔴 Inné · 🟡 Gach lá · 🔵 Amárach. Spot the clues: <b>h</b> or <b>D’</b> = Inné, <b>-íonn</b> = Gach lá, <b>-óidh / -eoidh</b> = Amárach.',
        build:() => [...take(VERBS, 8).map(v => pick([() => vbWhich(v, pick(['past','pres','fut','cmd'])), () => vbForm(v, pick(['past','pres','fut']))])()), ...take(VERBS, 2).map(vbSeq)]},
       {nm:'Ainm & Aidiacht', e:'🏷️', sb:'ag ceannach, ceannaithe', learn:() => verbTable(VERBS, ['cmd','vn','va']),
        tip:'<b>Ainm briathartha</b> goes after <b>ag</b>: <b>ag ceannach</b> = buying. <b>Aidiacht bhriathartha</b> = “-ed”: <b>ceannaithe</b> = bought.',
        build:() => shuffle([...take(VERBS, 5).map(v => vbForm(v, 'vn')), ...take(VERBS, 5).map(v => vbForm(v, 'va')), ...take(VERBS.filter(v => v.id !== 'I'), 2).map(v => vbWhich(v, pick(['vn','va'])))])},
-      {nm:'Mé & Muid', e:'👫', sb:'-ím, -íomar, -ímid', learn:() => verbTable(vRange(0, 6), ['cmd','presMe','pastWe','presWe','futWe']),
-       tip:'These have the person built in — no “mé” or “muid” after them!<br>🟡 mé <b>-(a)ím</b> · 🔴 muid <b>-(a)íomar</b> · 🟡 muid <b>-(a)ímid</b> · 🔵 muid <b>-(e)óimid</b>',
+      {nm:'Mé & Muid', e:'👫', sb:'-ím, -íomar, -ímid', learn:() => verbTable(VERBS, ['cmd','presMe','pastWe','presWe','futWe']),
+       tip:'These have the person built in — no “mé” or “muid” after them!<br>🟡 mé <b>-(a)ím</b> · 🔴 muid <b>-(a)íomar</b> · 🟡 muid <b>-(a)ímid</b> · 🔵 muid <b>-óimid / -eoimid</b>',
        build:() => take(VERBS, 12).map(v => vbPerson(v, pick(Object.keys(PFORM))))},
       {nm:'Ní & An', e:'🙅', sb:'not… and questions', learn:() => rowsTable(['', 'Not', 'Question?'], [
           [pill('cmd'), 'Ná', '—'], [pill('past'), 'Níor + h', 'Ar + h …?'], [pill('pres'), 'Ní + h', 'An + urú …?'], [pill('fut'), 'Ní + h', 'An + urú …?']]) +
           verbTable(vRange(0, 4).map(v => ({...v, cmd:v.negPast, past:v.qPast, pres:v.negPres, fut:v.qFut})), ['cmd','past','pres','fut']).replace('Ordú','Níor').replace('>Inné<','>Ar…?<').replace('>Gach lá<','>Ní…<').replace('>Amárach<','>An…?<'),
-       tip:'Like the circles and squares on the card: <b>Níor</b>/<b>Ar</b> for Inné, <b>Ní</b>/<b>An</b> for Gach lá and Amárach, <b>Ná</b> for commands.',
+       tip:'Like the circles and squares on the card: <b>Níor</b>/<b>Ar</b> for Inné, <b>Ní</b>/<b>An</b> for Gach lá and Amárach, <b>Ná</b> for commands.<br>• <b>Níor, Ar, Ní</b> add <b>h</b>: Níor cheannaigh, Ní fhoghlaimíonn (the D’ goes: Níor oscail)<br>• <b>An</b> adds a letter in front: c→<b>g</b>c, t→<b>d</b>t, d→<b>n</b>d, f→<b>bh</b>f. Vowels don’t change: An éiríonn?<br>• <b>Ná</b> + vowel adds h: Ná <b>h</b>inis!',
        build:() => take(VERBS, 12).map(v => vbNeg(v, pick(Object.keys(NEG))))},
       {nm:'Abair é!', e:'🏆', sb:'Say it · speed', boss:true, timed:true, learn:() => verbTable(VERBS, ['cmd','past','pres','fut']),
-       tip:'⏱️ Speed round — turn English sentences into Irish!', build:() => take(VERBS, 12).map(vbSent)},
+       tip:'⏱️ Speed round — turn English sentences into Irish! Remember: <b>-ím</b> = I · <b>-íomar / -ímid / -óimid</b> = we · <b>Níor / Ar</b> = Inné · <b>Ní / An</b> = Gach lá & Amárach.', build:() => take(VERBS, 12).map(vbSent)},
     ]},
   { id:'ceisteanna', title:'Ceisteanna', emoji:'❓', bg:'linear-gradient(135deg,#F5A623,#FF883E)',
     blurb:'Who, what, where… plus how to answer: Tá / Níl, Is maith liom…',
+    about:'First the question words, then how to answer. Irish has no word for “yes” or “no” — you answer with the verb from the question: <b>An bhfuil tú tuirseach?</b> → <b>Tá</b> (yes) / <b>Níl</b> (no). Same with likes: <b>An maith leat…?</b> → <b>Is maith liom</b> / <b>Ní maith liom</b>.',
     levels:[
-      {nm:'Cé? Cad? Cá?', e:'🕵️', sb:'who, what, where…', learn:() => rowsTable(['Gaeilge','English'], QW.slice(0, 5).map(q => [q[0], q[1]])),
-       tip:'Cad is ainm duit? · Cá bhfuil tú? · Conas atá tú?', build:() => [...shuffle(range(5)).map((i, k) => qwQ(i, k < 2 ? 0 : rnd(2))), ...take(range(5), 3).map(i => qwQ(i)), matchQ(range(5).map(i => [QW[i][0], QW[i][1], 'qw:' + i]))]},
-      {nm:'Cén fáth?', e:'🤔', sb:'why, how many…', learn:() => rowsTable(['Gaeilge','English'], QW.slice(5, 9).map(q => [q[0], q[1]])),
-       tip:'<b>Cén</b> = which / what: Cén fáth? (what reason = why) · Cén t-am é? (what time is it)', build:() => [...shuffle(range(5, 9)).map((i, k) => qwQ(i, k < 2 ? 0 : rnd(2))), ...take(range(5, 9), 2).map(i => qwQ(i)), ...take(range(5), 2).map(i => qwQ(i)), matchQ(range(4, 9).map(i => [QW[i][0], QW[i][1], 'qw:' + i]))]},
+      {nm:'Cé? Cad? Cá?', e:'🕵️', scope:{qw:range(5)}, sb:'who, what, where…', learn:() => rowsTable(['Gaeilge','English'], QW.slice(0, 5).map(q => [q[0], q[1]])),
+       tip:'<b>Cad is ainm duit?</b> (What’s your name?) · <b>Cá bhfuil tú?</b> (Where are you?) · <b>Conas atá tú?</b> (How are you?) · <b>Cár</b> is used with the past: <b>Cár imigh sé?</b> (Where did he go?)', build:() => [...shuffle(range(5)).map((i, k) => qwQ(i, k < 2 ? 0 : rnd(2))), ...take(range(5), 3).map(i => qwQ(i)), matchQ(range(5).map(i => [QW[i][0], QW[i][1], 'qw:' + i]))]},
+      {nm:'Cén fáth?', e:'🤔', scope:{qw:range(9)}, sb:'why, how many…', learn:() => rowsTable(['Gaeilge','English'], QW.slice(5, 9).map(q => [q[0], q[1]])),
+       tip:'<b>Cén</b> = which / what: Cén fáth? (what reason = why) · Cén t-am é? (what time is it)', build:() => [...shuffle(range(5, 9)).map((i, k) => qwQ(i, k < 2 ? 0 : rnd(2))), ...take(range(5, 9), 2).map(i => qwQ(i)), ...take(range(5), 2).map(i => qwQ(i)).map(q => ({...q, tag:`🔁 Siar · from Level 1 · ${q.tag}`})), matchQ(range(5, 9).map(i => [QW[i][0], QW[i][1], 'qw:' + i]))]},
       {nm:'Cad a tharla?', e:'💥', sb:'what happened…', learn:() => rowsTable(['Gaeilge','English'], QW.slice(9).map(q => [q[0], q[1]])),
-       tip:'<b>Cé hé sin?</b> for a boy/man, <b>Cé hí sin?</b> for a girl/woman.', build:() => [...shuffle(range(9, 14)).map((i, k) => qwQ(i, k < 2 ? 0 : rnd(2))), ...take(range(9, 14), 2).map(i => qwQ(i)), ...take(range(9), 2).map(i => qwQ(i)), matchQ(take(range(9, 14), 5).map(i => [QW[i][0], QW[i][1], 'qw:' + i]))]},
+       tip:'<b>Cé hé sin?</b> for a boy/man, <b>Cé hí sin?</b> for a girl/woman.', build:() => [...shuffle(range(9, 14)).map((i, k) => qwQ(i, k < 2 ? 0 : rnd(2))), ...take(range(9, 14), 2).map(i => qwQ(i)), ...take(range(9), 2).map(i => qwQ(i)).map(q => ({...q, tag:`🔁 Siar · from earlier levels · ${q.tag}`})), matchQ(take(range(9, 14), 5).map(i => [QW[i][0], QW[i][1], 'qw:' + i]))]},
       {nm:'Tá / Níl', e:'🔁', sb:'Bhí, Tá, Bíonn, Beidh', learn:() => rowsTable(['', 'Question', 'Yes', 'No', 'Where…?'], BI.map(b => [biPill(b), b.q, b.y, b.n, b.wh])),
        tip:'Irish has no word for “yes” or “no” — you answer with the verb! <b>An bhfuil tú tuirseach?</b> → <b>Tá</b> / <b>Níl</b>.',
        build:() => shuffle([...range(4).map(i => biAns(i)), ...take(range(4), 2).map(i => biAns(i)), ...take(range(4), 3).map(biTense), ...take(range(4), 2).map(biWh), matchQ(BI.map((b, i) => [b.q, b.y, `bi:${i}:y`]), 'Meaitseáil · Match each question to its “yes” answer')])},
       {nm:'Is maith liom', e:'😋', sb:'like, would like, can', learn:() => rowsTable(['Question', 'English', 'Yes', 'No'], LIKE.map(l => [l.q, l.en, l.y, l.n])),
-       tip:'Answer with the same word as the question: <b>An féidir</b> leat…? → <b>Is féidir</b> liom.',
+       tip:'Answer with the same word, and <b>leat</b> becomes <b>liom</b>: <b>An maith leat?</b> → <b>Is maith liom</b> · <b>Ar mhaith leat?</b> → <b>Ba mhaith liom</b> / <b>Níor mhaith liom</b> · <b>An féidir leat?</b> → <b>Is féidir liom</b>.',
        build:() => shuffle([...range(3).map(i => lkAns(i, true)), ...range(3).map(i => lkAns(i, false)), ...range(3).map(i => lkMean(i)), lkMean(rnd(3)), matchQ(LIKE.map((l, i) => [l.q, l.en, `lk:${i}:q`])), matchQ(LIKE.map((l, i) => [l.q, l.y, `lk:${i}:y`]), 'Meaitseáil · Match each question to its “yes” answer')])},
-      {nm:'Ceist & Freagra', e:'🏆', sb:'Everything · speed', boss:true, timed:true, learn:() => rowsTable(['Gaeilge','English'], QW.map(q => [q[0], q[1]])),
+      {nm:'Ceist & Freagra', e:'🏆', sb:'Everything · speed', boss:true, timed:true, learn:() => rowsTable(['Gaeilge','English'], QW.map(q => [q[0], q[1]])) + rowsTable(['', 'Question', 'Yes', 'No'], BI.map(b => [biPill(b), b.q, b.y, b.n])) + rowsTable(['Question', 'English', 'Yes', 'No'], LIKE.map(l => [l.q, l.en, l.y, l.n])),
        tip:'⏱️ Speed round — 12 seconds each!', build:() => shuffle([...take(range(14), 7).map(i => qwQ(i)), ...take(range(4), 3).map(i => biAns(i)), ...take(range(3), 2).map(i => lkAns(i))])},
     ]},
 ];
@@ -895,6 +945,7 @@ function renderMap(g){
   keyHandler = null; view = 'map';
   const st = gp(g).stars;
   app.innerHTML = `<div class="top"><a class="back" href="#">← Cluichí</a><div class="t">${g.emoji} ${g.title}</div><div class="chip">⭐ ${gameStars(g).got}/${gameStars(g).max}</div></div>
+    ${g.about ? `<div class="tip">💡 ${g.about}</div>` : ''}
     <div class="levels">${g.levels.map((l, i) => { const open = i === 0 || (st[i - 1] || 0) >= 1, s = st[i] || 0;
       return `<button class="lvl ${open ? '' : 'locked'} ${l.boss ? 'boss' : ''}" data-i="${i}"><span class="n">${i + 1}</span><div class="e">${open ? l.e : '🔒'}</div>
         <div class="nm">${l.nm}</div><div class="sb">${l.sb}</div><div class="st">${[0,1,2].map(k => `<span class="${k < s ? 'on' : ''}">★</span>`).join('')}</div></button>`; }).join('')}</div>
@@ -917,7 +968,8 @@ function renderIntro(g, i){
 }
 function play(g, i){
   const l = g.levels[i], hasNext = i + 1 < g.levels.length;
-  startRound({ title:`${l.e} ${l.nm}`, list:l.build(), timed:!!l.timed,
+  SCOPE = l.scope || null; const list = l.build(); SCOPE = null;
+  startRound({ title:`${l.e} ${l.nm}`, list, timed:!!l.timed,
     back:() => renderMap(g), again:() => play(g, i), next:() => renderIntro(g, i + 1),
     onEnd:stars => {
       const d = gp(g); d.stars[i] = Math.max(d.stars[i] || 0, stars);
@@ -954,7 +1006,7 @@ function renderCard(){
     ${prepTable(['ar','ag','do','le','ó','de','as'])}${prepTable(['faoi','chuig','roimh','i','thar','idir'])}
     <div class="sec">Briathra <small>verbs</small></div>
     ${verbTable(VERBS, ['label','cmd','past','pres','fut','vn','va'])}
-    ${rowsTable(['', 'mé', 'sinn / muid', 'Not', 'Question'], [[pill('cmd'), '', '', 'Ná', ''], [pill('past'), '', '-(a)íomar', 'Níor', 'Ar…?'], [pill('pres'), '-(a)ím', '-(a)ímid', 'Ní', 'An…?'], [pill('fut'), '', '-(e)óimid', 'Ní', 'An…?'], [pill('vn'), 'ag …', '', '', '']])}
+    ${rowsTable(['', 'mé', 'sinn / muid', 'Not', 'Question'], [[pill('cmd'), '', '', 'Ná', ''], [pill('past'), '', '-(a)íomar', 'Níor', 'Ar…?'], [pill('pres'), '-(a)ím', '-(a)ímid', 'Ní', 'An…?'], [pill('fut'), '', '-óimid / -eoimid', 'Ní', 'An…?'], [pill('vn'), 'ag …', '', '', '']])}
     <div class="sec">Ceisteanna <small>question words</small></div>
     ${rowsTable(null, QW.map(q => [q[1], q[0]]))}
     <div class="sec">Bí <small>to be</small></div>
